@@ -1,46 +1,69 @@
 <?php
 
-    class stats extends module {
-        
-        public $allowedMethods = array();
-        
-        public $pageName = 'Game Statistics';
+class stats extends module {
 
-        public function getUsers($alive) {
+    public $allowedMethods = array();
 
-            if ($alive) {
-                $sql = "
+    public $pageName = 'Game Statistics';
+
+    public function getUsers($alive) {
+
+        if ($alive) {
+            $sql = "
                     SELECT * FROM users INNER JOIN userTimers ON (UT_user = U_id AND UT_desc = 'signup') WHERE U_userLevel = 1 AND U_status != 0 ORDER BY UT_time DESC LIMIT 0, 20
                 ";
-                $timer = "signup";
-            } else {
-                $sql = "
+            $timer = "signup";
+        } else {
+            $sql = "
                     SELECT * FROM users INNER JOIN userTimers ON (UT_user = U_id AND UT_desc = 'killed') WHERE U_userLevel = 1 AND U_status = 0 ORDER BY UT_time DESC LIMIT 0, 20
                 ";
-                $timer = "killed";
-            }
-
-            $users = $this->db->prepare($sql);
-            $users->execute();
-            $allUsers = $users->fetchAll(PDO::FETCH_ASSOC);
-
-            $userObjects = array();
-
-            foreach ($allUsers as $user) {
-                $user = new User($user["U_id"]);
-                $userObjects[] = array(
-                    "user" => $user->user, 
-                    "date" => $this->date($user->getTimer($timer))
-                );
-            }
-
-            return $userObjects;
-
+            $timer = "killed";
         }
-        
-        public function constructModule() {
 
-            $stats = $this->db->prepare("
+        $users = $this->db->prepare($sql);
+        $users->execute();
+        $allUsers = $users->fetchAll(PDO::FETCH_ASSOC);
+
+        $userObjects = array();
+
+        foreach ($allUsers as $user) {
+            $user = new User($user["U_id"]);
+            $userObjects[] = array(
+                "user" => $user->user,
+                "date" => $this->date($user->getTimer($timer))
+            );
+        }
+
+        return $userObjects;
+
+    }
+
+    public function getRanks() {
+
+        $sql = "
+                SELECT R_id, R_name, (SELECT COUNT(*) FROM `users` where `users`.`U_userLevel` = `ranks`.`R_id`) AS ranksCount from `ranks` order by `R_id` desc
+            ";
+
+        $ranks = $this->db->prepare($sql);
+        $ranks->execute();
+        $allRanks = $ranks->fetchAll(PDO::FETCH_ASSOC);
+
+        $RankObjects = array();
+
+        foreach ($allRanks as $rank) {
+            $RankObjects[] = array(
+                "rank" => $rank['R_name'],
+                "count" => $rank['ranksCount']
+            );
+        }
+
+        return $RankObjects;
+
+    }
+
+    public function constructModule() {
+
+        $stats = $this->db->prepare("
                 SELECT 
                     SUM(US_bullets) as 'bullets',
                     SUM(US_points) as 'points',
@@ -50,10 +73,10 @@
                 WHERE U_status != 0 AND U_userLevel = 1
                 ORDER BY U_id DESC LIMIT 0, 20
             ");
-            $stats->execute();
-            $stats = $stats->fetch(PDO::FETCH_ASSOC);
+        $stats->execute();
+        $stats = $stats->fetch(PDO::FETCH_ASSOC);
 
-            $deadStats = $this->db->prepare("
+        $deadStats = $this->db->prepare("
                 SELECT 
                     SUM(US_bullets) as 'bullets',
                     SUM(US_money) + SUM(US_bank) as 'cash', 
@@ -62,20 +85,19 @@
                 WHERE U_status = 0 
                 ORDER BY U_id DESC LIMIT 0, 20
             ");
-            $deadStats->execute();
-            $deadStats = $deadStats->fetch(PDO::FETCH_ASSOC);
+        $deadStats->execute();
+        $deadStats = $deadStats->fetch(PDO::FETCH_ASSOC);
 
-            $this->html .= $this->page->buildElement("stats", array(
-                "newUsers" => $this->getUsers(true), 
-                "deadUsers" => $this->getUsers(false), 
-                "dead" => $deadStats["dead"],
-                "alive" => $stats["alive"],
-                "points" => $stats["points"],
-                "cash" => $stats["cash"],
-                "bullets" => $stats["bullets"]
-            ));
-        }
-        
+        $this->html .= $this->page->buildElement("stats", array(
+            "newUsers" => $this->getUsers(true),
+            "deadUsers" => $this->getUsers(false),
+            "gameRank" => $this->getRanks(),
+            "dead" => $deadStats["dead"],
+            "alive" => $stats["alive"],
+            "points" => $stats["points"],
+            "cash" => $stats["cash"],
+            "bullets" => $stats["bullets"]
+        ));
     }
 
-?>
+}
