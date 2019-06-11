@@ -1,12 +1,24 @@
 <?php
 
-    class statsTemplate extends template {
-        
-        public $stats = '
+class statsTemplate extends template {
+
+    public $stats = '
 
             <div class="row">
-                <div class="col-md-7">
-
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Game Rank</div>
+                        <div class="panel-body">
+                            <ul class="list-group text-left">
+                                {#each gameRank}
+                                    <li class="list-group-item">
+                                        {rank}
+                                        <span class="badge">{count}</span>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">New Players</div>
                         <div class="panel-body">
@@ -37,8 +49,35 @@
                             </div>
                         </div>
                     </div>
+                    
+                    </div>
 
 
+                <div class="col-md-6">
+                
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Game Stats</div>
+                        <div class="panel-body">
+                            <ul class="list-group text-left">
+                                <li class="list-group-item">
+                                    Players Alive
+                                    <span class="badge">{alive}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    Dead Players
+                                    <span class="badge">{dead}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    Cash
+                                    <span class="badge">${number_format cash}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    Bullets
+                                    <span class="badge">{number_format bullets}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">Recently Killed</div>
                         <div class="panel-body">
@@ -69,39 +108,9 @@
                             </div>
                         </div>
                         </div>
-                    </div>
-
-
-                <div class="col-md-5">
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Game Stats</div>
-                        <div class="panel-body">
-                            <ul class="list-group text-left">
-                                <li class="list-group-item">
-                                    Players Alive
-                                    <span class="badge">{alive}</span>
-                                </li>
-                                <li class="list-group-item">
-                                    Dead Players
-                                    <span class="badge">{dead}</span>
-                                </li>
-                                <li class="list-group-item">
-                                    Cash
-                                    <span class="badge">${number_format cash}</span>
-                                </li>
-                                <li class="list-group-item">
-                                    Bullets
-                                    <span class="badge">{number_format bullets}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </div>
 
         ';
-        
-    }
 
-?>
+}
