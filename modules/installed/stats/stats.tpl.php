@@ -75,6 +75,19 @@
                 <div class="col-md-5">
 
                     <div class="panel panel-default">
+                        <div class="panel-heading">Game Rank</div>
+                        <div class="panel-body">
+                            <ul class="list-group text-left">
+                                {#each gameRank}
+                                    <li class="list-group-item">
+                                        {rank}
+                                        <span class="badge">{count}</span>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
                         <div class="panel-heading">Game Stats</div>
                         <div class="panel-body">
                             <ul class="list-group text-left">
@@ -103,5 +116,3 @@
         ';
         
     }
-
-?>
